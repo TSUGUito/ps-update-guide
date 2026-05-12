@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photoshop 27.6 アップデート判断ガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ok: #1a7a4a;
+    --ok-bg: #e8f7ef;
+    --ok-border: #a8dfc0;
+    --ng: #c0392b;
+    --ng-bg: #fdf0ee;
+    --ng-border: #f0b8b2;
+    --caution: #b06000;
+    --caution-bg: #fff8ed;
+    --caution-border: #f5d49a;
+    --ink: #1a1a1a;
+    --ink2: #444;
+    --ink3: #777;
+    --line: #e0e0e0;
+    --bg: #f7f6f3;
+    --card-bg: #ffffff;
+    --accent: #1a1a1a;
+  }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 48px 32px;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── ヘッダー ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+  }
+  .header-left {}
+  .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--ink3);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .title span { color: #1a7a4a; }
+  .meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink3);
+    margin-top: 8px;
+    line-height: 1.8;
+  }
+  .version-pill {
+    background: var(--ink);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+    align-self: center;
+  }
+
+  /* ── リード文 ── */
+  .lead {
+    font-size: 14px;
+    color: var(--ink2);
+    line-height: 1.8;
+    margin: 18px 0 32px;
+    padding: 14px 18px;
+    border-left: 3px solid var(--ink);
+    background: #fff;
+  }
+
+  /* ── チェックリスト説明 ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .section-badge {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .badge-ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok-border); }
+  .badge-ng { background: var(--ng-bg); color: var(--ng); border: 1px solid var(--ng-border); }
+  .section-title-text {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* ── カード ── */
+  .cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 16px;
+    align-items: start;
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .card.ok-card { border-left: 4px solid var(--ok); }
+  .card.ng-card { border-left: 4px solid var(--ng); }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .icon-ok { background: var(--ok-bg); }
+  .icon-ng { background: var(--ng-bg); }
+
+  .card-content {}
+  .card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.7;
+  }
+  .card-desc b { font-weight: 700; color: var(--ng); }
+  .card-desc.ok-desc b { color: var(--ok); }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+  }
+  .tag {
+    font-size: 10.5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+  .tag-ok { background: var(--ok-bg); color: var(--ok); }
+  .tag-ng { background: var(--ng-bg); color: var(--ng); }
+
+
+
+  /* ── 注記 ── */
+  .caution-box {
+    background: var(--caution-bg);
+    border: 1px solid var(--caution-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--caution);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .caution-box strong { font-weight: 700; }
+
+  /* ── 修正履歴サマリー ── */
+  .history-section { margin-bottom: 32px; }
+  .history-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    margin-bottom: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+  .history-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .history-item {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    color: var(--ink2);
+    line-height: 1.6;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .history-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .dot-ok { background: var(--ok); }
+  .dot-ng { background: var(--ng); }
+  .dot-warn { background: var(--caution); }
+
+  /* ── フッター ── */
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink3);
+    line-height: 1.6;
+  }
+  .result-box {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 6px;
+    display: none;
+  }
+
+  /* ── 判定結果バナー ── */
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-left">
+      <div class="eyebrow">社内共有 / Photoshop Update Info</div>
+      <div class="title">27.6 アップデート<br><span>判断チェックリスト</span></div>
+      <div class="meta">
+        作成：TSUGU外部<br>
+        調査日：2026年5月12日<br>
+        対象：Photoshop 2026 v27.6（2026年4月28日リリース）
+      </div>
+    </div>
+    <div class="version-pill">v27.5 → v27.6</div>
+  </div>
+
+  <!-- リード -->
+  <div class="lead">
+    27.5から複数の不具合が修正された一方、削除ツールのバグやOTFフォント問題など<strong>解消されていない問題も残存</strong>しています。自分の作業内容に照らして「アップデートすべきか」を確認してください。
+  </div>
+
+  <!-- OK セクション -->
+  <div class="section-header">
+    <span class="section-badge badge-ok">✔ OK</span>
+    <span class="section-title-text">アップデートを検討</span>
+  </div>
+
+  <div class="cards" id="ok-cards">
+
+    <div class="card ok-card" data-type="ok">
+      <div class="card-icon icon-ok">🖼</div>
+      <div class="card-content">
+        <div class="card-name">写真レタッチ・合成がメインの人</div>
+        <div class="card-desc ok-desc">
+          全体的な動作安定性が向上。<b>カラー・バイブランス調整のUI反映バグ、スタイルエフェクトによるフリーズ、カーブプリセットの保存不具合</b>が27.6で修正済み。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ok">レタッチ</span>
+          <span class="tag tag-ok">合成</span>
+          <span class="tag tag-ok">カラー調整</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ok-card" data-type="ok">
+      <div class="card-icon icon-ok">📐</div>
+      <div class="card-content">
+        <div class="card-name">カンバスサイズをインチ・mmで扱うDTP・印刷系の人</div>
+        <div class="card-desc ok-desc">
+          27.4〜27.5で発生していた「カンバスサイズがルーラー設定を無視してpx表示になる」バグが<b>27.6で修正済み</b>。インチ・mm単位の印刷ワークは恩恵あり。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ok">DTP</span>
+          <span class="tag tag-ok">印刷</span>
+          <span class="tag tag-ok">インチ / mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ok-card" data-type="ok">
+      <div class="card-icon icon-ok">🎨</div>
+      <div class="card-content">
+        <div class="card-name">Firefly Fill &amp; Expand で生成AIを使っている人</div>
+        <div class="card-desc ok-desc">
+          推奨モデルとして安定動作。リファレンス画像まわりのフリーズ・消失バグも複数修正済みで、<b>生成AI機能は27.5より安定</b>している。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ok">生成塗りつぶし</span>
+          <span class="tag tag-ok">Generative Fill</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ok-card" data-type="ok">
+      <div class="card-icon icon-ok">👤</div>
+      <div class="card-content">
+        <div class="card-name">CMYKでSelect People・人物選択を使う人</div>
+        <div class="card-desc ok-desc">
+          27.4で修正された「Select PeopleがCMYK画像で機能しない」バグは27.6でも引き続き解消。<b>CMYKワークフローは安定</b>。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ok">CMYK</span>
+          <span class="tag tag-ok">人物選択</span>
+          <span class="tag tag-ok">Select People</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NG セクション -->
+  <div class="section-header">
+    <span class="section-badge badge-ng">✘ NG</span>
+    <span class="section-title-text">アップデート非推奨</span>
+  </div>
+
+  <div class="cards" id="ng-cards">
+
+    <div class="card ng-card" data-type="ng">
+      <div class="card-icon icon-ng">🧹</div>
+      <div class="card-content">
+        <div class="card-name">削除ツールを日常的に使っている人</div>
+        <div class="card-desc">
+          27.4以降、「要求された操作を完了できません（プログラムエラー）」が<b>27.6でも未解消</b>。27.3.1なら問題なし。削除ツールが業務の軸にある場合はダウングレード推奨。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ng">削除ツール</span>
+          <span class="tag tag-ng">Remove Tool</span>
+          <span class="tag tag-ng">レタッチ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ng-card" data-type="ng">
+      <div class="card-icon icon-ng">🔤</div>
+      <div class="card-content">
+        <div class="card-name">OTFフォントを多用するタイポグラフィ作業の人</div>
+        <div class="card-desc">
+          27.6でOTFフォント＋ダッシュ記号（例：「-Hello」）の入力バグが<b>新たに発生・未解消</b>。テキスト組みが主体の案件では予期しない挙動に注意。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ng">OTFフォント</span>
+          <span class="tag tag-ng">テキスト組み</span>
+          <span class="tag tag-ng">タイポグラフィ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ng-card" data-type="ng">
+      <div class="card-icon icon-ng">🤖</div>
+      <div class="card-content">
+        <div class="card-name">Firefly Image 3のワークフローが確立している人</div>
+        <div class="card-desc">
+          27.6でFirefly Image 3が<b>モデルピッカーから完全削除</b>。Firefly Fill &amp; Expandへの切り替えが必須。準備が済んでいない場合は27.5以前に留まること（2026年8月まで使用可）。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ng">Firefly Image 3</span>
+          <span class="tag tag-ng">生成AI</span>
+          <span class="tag tag-ng">既存フロー</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ng-card" data-type="ng">
+      <div class="card-icon icon-ng">💻</div>
+      <div class="card-content">
+        <div class="card-name">旧GPU（GTX 1650以前等）環境の人</div>
+        <div class="card-desc">
+          27.6から「Find Distractions（汎用ディストラクター除去）」が高スペックGPUを要求。対応外の環境では<b>AI系新機能がほぼ使用不可</b>。アップデートのメリットが薄い。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ng">旧GPU</span>
+          <span class="tag tag-ng">GTX 10/16系</span>
+          <span class="tag tag-ng">AI機能</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card ng-card" data-type="ng">
+      <div class="card-icon icon-ng">↔</div>
+      <div class="card-content">
+        <div class="card-name">矢印キーで1px単位のカンバス調整をしている人</div>
+        <div class="card-desc">
+          単位ズレは修正されたが、0.01px刻みになる問題の<b>完全解消は公式に未明記</b>。ピクセルパーフェクトな作業が必須なら27.6での動作確認を先に実施すること。
+        </div>
+        <div class="tags">
+          <span class="tag tag-ng">ピクセル調整</span>
+          <span class="tag tag-ng">UI制作</span>
+          <span class="tag tag-ng">バナー</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 注意書き -->
+  <div class="caution-box">
+    ⚠️ <strong>ダウングレード方法：</strong> Creative Cloud デスクトップアプリ → アプリ一覧 → Photoshop の「…」→「他のバージョン」→ 27.3.1 を選択してインストール。<br>
+    本番環境への適用前に、必ず検証環境で動作確認を行ってください。
+  </div>
+
+  <!-- 修正サマリー -->
+  <div class="history-section">
+    <div class="history-title">27.6 主な修正サマリー（27.5からの変化）</div>
+    <div class="history-grid">
+      <div class="history-item">
+        <div class="history-dot dot-ok"></div>
+        <div>カーブ調整プリセット（Greenチャンネル）が保存できない問題 → <strong>修正済み</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-ok"></div>
+        <div>カンバスサイズの単位がルーラー設定と連動しない問題 → <strong>修正済み</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-ok"></div>
+        <div>スタイルエフェクトによるシステムフリーズ → <strong>修正済み</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-ok"></div>
+        <div>リファレンス画像が生成時に消える・フリーズ → <strong>修正済み</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-ng"></div>
+        <div>削除ツールのプログラムエラー（27.4〜） → <strong>未解消</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-ng"></div>
+        <div>OTFフォント＋ダッシュ入力バグ → <strong>新たに発生</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-warn"></div>
+        <div>カンバスサイズ 0.01px刻み問題 → <strong>部分解消（要確認）</strong></div>
+      </div>
+      <div class="history-item">
+        <div class="history-dot dot-warn"></div>
+        <div>Firefly Image 3 廃止（8月に完全終了） → <strong>切り替え必須</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- フッター -->
+  <div class="footer">
+    <div class="footer-text">
+      情報ソース：Adobe公式リリースノート・コミュニティフォーラム・Yahoo!知恵袋<br>
+      ※ 個人の環境により挙動が異なる場合があります
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
